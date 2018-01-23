@@ -2,6 +2,7 @@ package com.example.android.parkhere;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -18,6 +19,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -29,17 +34,27 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MapSearchPage extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerClickListener,
-        GoogleMap.OnMapLongClickListener {
+        GoogleMap.OnMapLongClickListener
+       // GoogleMap.OnPolylineClickListener
+  {
 
         private GoogleMap map;
         private GoogleApiClient googleApiClient;
         private Location currentLocation;
+
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -92,9 +107,10 @@ public class MapSearchPage extends FragmentActivity implements OnMapReadyCallbac
                 MarkerOptions options = new MarkerOptions().position(latLng);
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 options.title("Parking Space Status");
-                options.snippet("Red No !");
+                options.snippet("Red Unavailable !");
                 map.addMarker(options);
         }
+
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -104,18 +120,24 @@ public class MapSearchPage extends FragmentActivity implements OnMapReadyCallbac
 
                LatLng latLng = new LatLng(40.7484, -73.9857);
 
-
-
-
-
                 // add a marker to current location and move the camera
                 MarkerOptions marker = new MarkerOptions()
                         .position(latLng)
-                        .title("Sample Position")
+                        .title("Current Location")
                         .snippet("This is me !!!")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
                 map.addMarker(marker);
+
+            Circle circle = map.addCircle(new CircleOptions()
+                    .center(marker.getPosition())
+                    .radius(100)
+                    .strokeColor(Color.RED)
+                    //.fillColor(Color.GREEN)
+            );
+
+
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+
                 map.setOnMarkerClickListener(this);
                 map.setOnMapLongClickListener(this);
         }
@@ -124,15 +146,28 @@ public class MapSearchPage extends FragmentActivity implements OnMapReadyCallbac
 
         @Override
         public boolean onMarkerClick(Marker marker) {
+
+            double longitude = marker.getPosition().longitude;
+            double latitude = marker.getPosition().latitude;
+            Polyline polyline1 = map.addPolyline((new PolylineOptions())
+                    .clickable(true)
+                    .add(new LatLng(40.7484, -73.9857),
+                            new LatLng(latitude, longitude))
+                    .color(Color.BLUE)
+            );
+
                 if (marker.getTitle().equals("Parking Space Status")) {
-                        if (marker.getSnippet().equals("Red No !")){
+
+                        if (marker.getSnippet().equals("Red Unavailable !")){
                                 marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                marker.setSnippet("Green Yes !");
+                                marker.setSnippet("Space Available !");
                                 marker.showInfoWindow();
                         }
-                        else {
-                                marker.remove();
+                        else if (marker.getSnippet().equals("Space Available !")){
+                            polyline1.setVisible(false);
+                            marker.remove();
                         }
+
                 }
                 else
                         marker.showInfoWindow();

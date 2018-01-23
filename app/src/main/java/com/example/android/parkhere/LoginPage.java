@@ -31,7 +31,8 @@ public class LoginPage extends AppCompatActivity {
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            startActivity(new Intent(LoginPage.this, RegisterPage.class));
+            Intent intent = new Intent(LoginPage.this, MapSearchPage.class);
+            startActivity(intent);
             finish();
         }
 

@@ -3,70 +3,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="100dp"
     android:gravity="center"
     android:orientation="vertical"
+    android:background="@drawable/background4"
     tools:context="com.example.android.parkhere.LoginPage">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:layout_width="155dp"
+        android:layout_height="127dp"
         android:layout_marginBottom="40dp"
         android:gravity="center"
-        android:text="ParkHere"
+        android:src="@drawable/logo"
         android:textSize="30sp" />
 
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:text="Email"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/userName"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter your email address"
-            android:inputType="textEmailAddress"
-            android:maxLines="1" />
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/userName"
+                android:background="@drawable/rounded_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="EMAIL"
+                android:inputType="textEmailAddress"
+                android:layout_marginBottom="15dp"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
 
-    </LinearLayout>
 
-    <LinearLayout
-
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-
-            android:id="@+id/password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Password:"
-            android:textSize="16sp"
-            android:textStyle="bold" />
 
         <EditText
-
             android:id="@+id/userPassword"
+            android:background="@drawable/rounded_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter your password"
+            android:hint="PASSWORD"
             android:inputType="textPassword"
             android:maxLines="1" />
 
@@ -78,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="30dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -87,14 +64,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Login" />
+            android:layout_marginRight="30dp"
+            android:textStyle="bold"
+            android:text="Login"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:background="#42A5F5"/>
 
         <Button
             android:id="@+id/register_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Register" />
+            android:textStyle="bold"
+            android:text="Register"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:background="#42A5F5"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp" />
 
     </LinearLayout>
 

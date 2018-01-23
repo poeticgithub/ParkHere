@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,6 +34,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +47,36 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
+
+
+
 public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+
+
+    @IgnoreExtraProperties
+    public class User {
+
+        public String parklocations;
+        public String parkstatus;
+
+        public User() {
+            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        }
+
+        public User(String username, String email) {
+            this.parklocations = username;
+            this.parkstatus = email;
+        }
+
+    }
 
     private EditText userName, userPassword;
     private Button register_button;
     private FirebaseAuth auth;
+    private FirebaseDatabase database;
+    private DatabaseReference mdatabase;
+
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -93,7 +122,7 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
                         @Override
                         @TargetApi(Build.VERSION_CODES.M)
                         public void onClick(View v) {
-                                requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
                         }
                     });
         } else {
@@ -158,7 +187,7 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            mAuthTask.execute();
         }
     }
 
@@ -279,6 +308,12 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
 
+        // Get Firebase database instance
+        database = FirebaseDatabase.getInstance();
+
+        mdatabase = database.getReference().child("Users");
+
+
         userName = (EditText) findViewById(R.id.email);
         userPassword = (EditText) findViewById(R.id.userPassword);
         register_button = (Button) findViewById(R.id.register_button);
@@ -286,8 +321,8 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
         register_button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent registerIntent = new Intent(RegisterPage.this, MapSearchPage.class);
-                RegisterPage.this.startActivity(registerIntent);
+                //Intent registerIntent = new Intent(RegisterPage.this, MapSearchPage.class);
+                //RegisterPage.this.startActivity(registerIntent);
 
                 String email = userName.getText().toString().trim();
                 String password = userPassword.getText().toString().trim();
@@ -307,6 +342,9 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
                     return;
                 }
 
+                mAuthTask = new UserLoginTask(email, password);
+
+
                 //create user
                 auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(RegisterPage.this, new OnCompleteListener<AuthResult>() {
@@ -320,11 +358,16 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
                                     Toast.makeText(RegisterPage.this, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
+                                    mAuthTask.createUser(task.getResult().getUser());
+
+
                                     startActivity(new Intent(RegisterPage.this, MapSearchPage.class));
                                     finish();
                                 }
                             }
                         });
+
+
             }
         });
 
@@ -368,6 +411,9 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
 
             try {
                 // Simulate network access.
+                Log.d("hello before", "hello again");
+
+                Log.d("hello after", "hello again");
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
@@ -402,6 +448,15 @@ public class RegisterPage extends AppCompatActivity implements LoaderCallbacks<C
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+
+
+        private void createUser(FirebaseUser userFromRegistration) {
+            String username = userFromRegistration.getEmail();
+            String userID = userFromRegistration.getUid();
+
+
+            mdatabase.child(userID).setValue(username);
         }
 
     }
